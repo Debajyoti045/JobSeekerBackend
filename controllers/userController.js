@@ -23,8 +23,8 @@ export const register = catchAsyncErrors(async (req, res, next) => {
 });
 
 export const login = catchAsyncErrors(async (req, res, next) => {
-  const { email, password, role } = req.body;
-  if (!email || !password || !role) {
+  const { email, password } = req.body;
+  if (!email || !password) {
     return next(new ErrorHandler("Please provide email ,password and role."));
   }
   const user = await User.findOne({ email }).select("+password");
@@ -34,11 +34,6 @@ export const login = catchAsyncErrors(async (req, res, next) => {
   const isPasswordMatched = await user.comparePassword(password);
   if (!isPasswordMatched) {
     return next(new ErrorHandler("Invalid Email Or Password.", 400));
-  }
-  if (user.role !== role) {
-    return next(
-      new ErrorHandler(`User with provided email and ${role} not found!`, 404)
-    );
   }
   sendToken(user, 201, res, "User Logged In!");
 });
